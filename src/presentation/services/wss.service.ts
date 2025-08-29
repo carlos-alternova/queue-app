@@ -3,7 +3,7 @@ import { WebSocket, WebSocketServer } from 'ws'
 
 interface Options {
   server: Server
-  path: string //
+  path?: string // The path for the WebSocket server
 }
 
 export class WssService {
