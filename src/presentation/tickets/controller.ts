@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import { TicketService } from '../services/ticket.service'
+import { UuidAdapter } from '../../config/uuid.adapter'
 
 export class TicketController {
   // DI - WSS service
@@ -19,8 +20,12 @@ export class TicketController {
   }
 
   public createTicket = async (req: Request, res: Response) => {
-    const ticket = req.body
-    const addedTicket = this.ticketService.createTicket(ticket)
+    const ticketInfo = req.body
+    const newTicket = {
+      id: UuidAdapter.v4(),
+      ...ticketInfo,
+    }
+    const addedTicket = this.ticketService.createTicket(newTicket)
     res.status(202).json({ message: `Ticket added: ${addedTicket}` })
   }
 
