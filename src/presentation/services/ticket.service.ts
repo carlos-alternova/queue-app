@@ -34,4 +34,19 @@ export class TicketService {
       throw Error(`Can not add ticket: ${error}`)
     }
   }
+
+  public drawTicket(desk: string) {
+    const freeTicket = this.tickets.find(
+      (ticket) => !ticket.handleAtDesk && !ticket.done
+    )
+    if (!freeTicket)
+      return { status: 'error', message: 'All tickets are being handled' }
+
+    freeTicket.handleAtDesk = desk
+    freeTicket.handleAt = new Date()
+
+    // TODO: Send to WebSocket
+
+    return { status: 'ok', ticket: freeTicket }
+  }
 }
