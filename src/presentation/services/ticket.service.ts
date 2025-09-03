@@ -4,14 +4,20 @@ import { Ticket } from '../../domain/interfaces/ticket'
 export class TicketService {
   constructor() {}
 
-  private tickets: Ticket[] = []
+  private readonly tickets: Ticket[] = []
+
+  private readonly handlingTickets: Ticket[] = []
 
   public get getTickets() {
     return this.tickets
   }
 
-  public get getPendingTickets() {
+  public get getPendingTickets(): Ticket[] {
     return this.tickets.filter((ticket) => !ticket.handleAtDesk && !ticket.done)
+  }
+
+  public get lastHandlingTickets(): Ticket[] {
+    return this.handlingTickets.splice(0, 4)
   }
 
   public lastTicketNumber() {
@@ -44,6 +50,8 @@ export class TicketService {
 
     freeTicket.handleAtDesk = desk
     freeTicket.handleAt = new Date()
+
+    this.handlingTickets.unshift({ ...freeTicket })
 
     // TODO: Send to WebSocket
 
