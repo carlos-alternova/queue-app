@@ -49,4 +49,14 @@ export class TicketService {
 
     return { status: 'ok', ticket: freeTicket }
   }
+
+  public onFinishTicket(id: string) {
+    const ticket = this.tickets.find((ticket) => ticket.id === id)
+
+    if (!ticket)
+      return { status: 'error', message: 'This ticket does not exist' }
+
+    ticket.done = true
+    return { status: 'ok', ticket }
+  }
 }
