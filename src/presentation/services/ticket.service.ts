@@ -20,14 +20,14 @@ export class TicketService {
     return this.handlingTickets.splice(0, 4)
   }
 
-  public lastTicketNumber() {
+  public get lastTicketNumber() {
     return this.tickets.length > 0 ? this.tickets.at(-1)!.number : 0
   }
 
   public createTicket() {
     const newTicket: Ticket = {
       id: UuidAdapter.v4(),
-      number: this.lastTicketNumber() + 1,
+      number: this.lastTicketNumber + 1,
       createdAt: new Date(),
       done: false,
     }

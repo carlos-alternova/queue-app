@@ -12,34 +12,29 @@ export class TicketController {
   }
 
   public getLastTicket = async (req: Request, res: Response) => {
-    res.json('getLastTicket')
+    res.json(this.ticketService.lastTicketNumber)
   }
 
   public getPendingTickets = async (req: Request, res: Response) => {
-    res.json('getPendingTickets')
+    res.json(this.ticketService.getPendingTickets)
   }
 
   public createTicket = async (req: Request, res: Response) => {
-    const ticketInfo = req.body
-    const newTicket = {
-      id: UuidAdapter.v4(),
-      ...ticketInfo,
-    }
-    const addedTicket = this.ticketService.createTicket(newTicket)
-    res.status(202).json({ message: `Ticket added: ${addedTicket}` })
+    const addedTicket = this.ticketService.createTicket()
+    res.status(202).json({ addedTicket })
   }
 
   public drawTicket = async (req: Request, res: Response) => {
     const { desk } = req.params
-    res.json(`drawTicket: ${desk}`)
+    res.json(this.ticketService.drawTicket(desk))
   }
 
   public markTicketAsDone = async (req: Request, res: Response) => {
     const { ticketId } = req.params
-    res.json(`markTicketAsDone: ${ticketId}`)
+    res.status(201).json(this.ticketService.onFinishTicket(ticketId))
   }
 
   public getWorkingOnTickets = async (req: Request, res: Response) => {
-    res.json('getWorkingOnTickets')
+    res.json(this.ticketService.lastHandlingTickets)
   }
 }
