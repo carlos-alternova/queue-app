@@ -12,4 +12,4 @@ const getPendingTickets = async () => {
 }
 
 getPendingTickets()
-connectToWebSockets()
+connectToWebSockets(pendingText)
