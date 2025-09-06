@@ -1,8 +1,9 @@
 import { UuidAdapter } from '../../config/uuid.adapter'
 import { Ticket } from '../../domain/interfaces/ticket'
+import { WssService } from './wss.service'
 
 export class TicketService {
-  constructor() {}
+  constructor(private readonly wssService = WssService.instance) {}
 
   private readonly tickets: Ticket[] = []
 
@@ -35,6 +36,10 @@ export class TicketService {
     try {
       this.tickets.push(newTicket)
       // TODO: Send to WebSocket
+      this.wssService.emit(
+        'onTicketCountChanged',
+        this.getPendingTickets.length
+      )
       return newTicket
     } catch (error) {
       throw Error(`Can not add ticket: ${error}`)

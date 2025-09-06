@@ -37,4 +37,17 @@ export class WssService {
       })
     })
   }
+
+  public emit(event: string, payload: Object) {
+    this.wss.clients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(
+          JSON.stringify({
+            event,
+            payload,
+          })
+        )
+      }
+    })
+  }
 }
