@@ -4,14 +4,7 @@ function connectToWebSockets(callback) {
   socket.onmessage = (event) => {
     const { type, payload } = JSON.parse(event.data)
 
-    switch (type) {
-      case 'onTicketCountChanged':
-        callback(payload)
-        break
-      default:
-        console.log('event data:', event.data)
-        break
-    }
+    callback(type, payload)
   }
 
   socket.onclose = (event) => {

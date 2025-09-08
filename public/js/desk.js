@@ -4,11 +4,23 @@ import connectToWebSockets from './socket-client.js'
 const deskTitle = document.querySelector('h1')
 const pendingText = document.getElementById('lbl-pending')
 const ticketsContainer = document.getElementById('tickets_container')
+const activeTicket = document.querySelector('small')
+const attendButton = document.querySelector('button')
 
 const getPendingTickets = async () => {
   const pendingTickets = await fetch('/api/ticket/pending').then((resp) =>
     resp.json()
   )
+
+  const allTickets = await fetch('/api/ticket').then((resp) => resp.json())
+
+  const deskName = getDeskName()
+  const activeDeskTicket = allTickets.tickets.find(
+    (ticket) => ticket.handleAtDesk === deskName && !ticket.done
+  )
+
+  const attendingText = activeDeskTicket ? activeDeskTicket.number : 'None'
+  activeTicket.innerText = attendingText
 
   if (pendingTickets.length > 0) ticketsContainer.classList.add('d-none')
 
@@ -31,14 +43,40 @@ const getDeskName = () => {
     throw new Error('deskName param is required')
   }
 
-  deskTitle.innerText = extractedParams.get('deskName')
+  return extractedParams.get('deskName')
 }
 
-const onWebSocketMessageCB = (payload) => {
-  ticketsContainer.classList.add('d-none')
-  pendingText.innerText = payload
+const setDeskName = () => {
+  const deskName = getDeskName()
+  deskTitle.innerText = deskName
 }
+
+const onWebSocketMessageCB = (type, payload) => {
+  switch (type) {
+    case 'onTicketCountChanged':
+      payload === 0
+        ? ticketsContainer.classList.remove('d-none')
+        : ticketsContainer.classList.add('d-none')
+      pendingText.innerText = payload
+      break
+    case 'onTicketDrawn':
+      activeTicket.innerText = payload
+      break
+    default:
+      console.log('event data:', event.data)
+      break
+  }
+}
+
+const onAssignButtonClick = async () => {
+  const deskName = getDeskName()
+
+  await fetch(`/api/ticket/draw/${deskName}`).then((resp) => resp.json())
+}
+
+// Listeners:
+attendButton.addEventListener('click', onAssignButtonClick)
 
 getPendingTickets()
-getDeskName()
+setDeskName()
 connectToWebSockets(onWebSocketMessageCB)

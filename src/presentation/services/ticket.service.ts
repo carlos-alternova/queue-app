@@ -53,12 +53,24 @@ export class TicketService {
     if (!freeTicket)
       return { status: 'error', message: 'All tickets are being handled' }
 
-    freeTicket.handleAtDesk = desk
-    freeTicket.handleAt = new Date()
+    try {
+      const activeDeskTicket = this.handlingTickets.find(
+        (ticket) => ticket.handleAtDesk === desk && !ticket.done
+      )
+      if (activeDeskTicket) this.onFinishTicket(activeDeskTicket.id)
 
-    this.handlingTickets.unshift({ ...freeTicket })
+      freeTicket.handleAtDesk = desk
+      freeTicket.handleAt = new Date()
+      this.handlingTickets.unshift({ ...freeTicket })
 
-    // TODO: Send to WebSocket
+      this.wssService.emit('onTicketDrawn', freeTicket.number)
+      this.wssService.emit(
+        'onTicketCountChanged',
+        this.getPendingTickets.length
+      )
+    } catch (error) {
+      throw Error(`Can not add ticket: ${error}`)
+    }
 
     return { status: 'ok', ticket: freeTicket }
   }
