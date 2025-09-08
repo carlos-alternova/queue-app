@@ -1,4 +1,4 @@
-function connectToWebSockets(element) {
+function connectToWebSockets(callback) {
   const socket = new WebSocket('ws://localhost:3000/ws')
 
   socket.onmessage = (event) => {
@@ -6,7 +6,7 @@ function connectToWebSockets(element) {
 
     switch (type) {
       case 'onTicketCountChanged':
-        element.innerText = `Pending: ${payload}`
+        callback(payload)
         break
       default:
         console.log('event data:', event.data)
