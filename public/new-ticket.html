@@ -22,12 +22,28 @@
           <span id="lbl-new-ticket"> Loading... </span>
         </td>
       </tr>
-      <tr>
+      <tr class="buttonContainer">
         <td>
           <button class="btn btn-secondary btn-lg">Generate new ticket</button>
         </td>
+        <td>
+          <button
+            onClick="location.href='index.html'"
+            class="btn btn-secondary btn-lg"
+          >
+            Go back
+          </button>
+        </td>
       </tr>
     </table>
+
+    <style>
+      .buttonContainer {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+      }
+    </style>
 
     <script src="./js/new-ticket.js"></script>
   </body>
