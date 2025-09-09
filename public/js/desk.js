@@ -4,9 +4,12 @@ import connectToWebSockets from './socket-client.js'
 const deskTitle = document.querySelector('h1')
 const pendingText = document.getElementById('lbl-pending')
 const ticketsContainer = document.getElementById('tickets_container')
-const activeTicket = document.querySelector('small')
+const activeTicketText = document.querySelector('small')
 const attendButton = document.getElementById('draw_btn')
 const finishButton = document.getElementById('finish_btn')
+
+// active ticket:
+let activeTicket
 
 const getPendingTickets = async () => {
   const pendingTickets = await fetch('/api/ticket/pending').then((resp) =>
@@ -19,9 +22,10 @@ const getPendingTickets = async () => {
   const activeDeskTicket = allTickets.tickets.find(
     (ticket) => ticket.handleAtDesk === deskName && !ticket.done
   )
+  activeTicket = activeDeskTicket
 
   const attendingText = activeDeskTicket ? activeDeskTicket.number : 'Nobody'
-  activeTicket.innerText = attendingText
+  activeTicketText.innerText = attendingText
 
   if (pendingTickets.length > 0) ticketsContainer.classList.add('d-none')
 
@@ -61,7 +65,7 @@ const onWebSocketMessageCB = (type, payload) => {
       pendingText.innerText = payload
       break
     case 'onTicketDrawn':
-      activeTicket.innerText = payload
+      activeTicketText.innerText = payload
       break
     default:
       console.log('event data:', event.data)
@@ -72,22 +76,18 @@ const onWebSocketMessageCB = (type, payload) => {
 const onAssignButtonClick = async () => {
   const deskName = getDeskName()
 
-  await fetch(`/api/ticket/draw/${deskName}`).then((resp) => resp.json())
+  const { ticket } = await fetch(`/api/ticket/draw/${deskName}`).then((resp) =>
+    resp.json()
+  )
+  if (ticket) activeTicket = ticket
 }
 
 const onFinishButtonClick = async () => {
-  const allTickets = await fetch('/api/ticket').then((resp) => resp.json())
+  if (!activeTicket) throw new Error('No active ticket yet')
 
-  const deskName = getDeskName()
-  const activeDeskTicket = allTickets.tickets.find(
-    (ticket) => ticket.handleAtDesk === deskName && !ticket.done
-  )
+  await fetch(`/api/ticket/done/${activeTicket.id}`, { method: 'PUT' })
 
-  if (!activeDeskTicket) throw new Error('No active ticket yet')
-
-  await fetch(`/api/ticket/done/${activeDeskTicket.id}`, { method: 'PUT' })
-
-  activeTicket.innerText = 'Nobody'
+  activeTicketText.innerText = 'Nobody'
 }
 
 // Listeners:
