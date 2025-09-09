@@ -7,7 +7,7 @@ export class TicketService {
 
   private readonly tickets: Ticket[] = []
 
-  private readonly handlingTickets: Ticket[] = []
+  private handlingTickets: Ticket[] = []
 
   public get getTickets() {
     return this.tickets
@@ -82,6 +82,10 @@ export class TicketService {
       return { status: 'error', message: 'This ticket does not exist' }
 
     ticket.done = true
+    this.handlingTickets = this.handlingTickets.filter(
+      (t) => t.id !== ticket.id
+    )
+    this.wssService.emit('onTicketDone', ticket.number)
     return { status: 'ok', ticket }
   }
 }

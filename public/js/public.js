@@ -1,3 +1,5 @@
+import connectToWebSockets from './socket-client.js'
+
 // HTML elements references:
 const primaryTicketNumber = document.getElementById('lbl_ticket_01')
 const primaryTicketDesk = document.getElementById('lbl_desk_01')
@@ -22,4 +24,18 @@ const getAttendingTickets = async () => {
   })
 }
 
+const onWebSocketMessageCB = (type, payload) => {
+  switch (type) {
+    case 'onTicketDone':
+    case 'onTicketCountChanged':
+    case 'onTicketDrawn':
+      getAttendingTickets()
+      break
+    default:
+      console.log('event data:', { type, payload })
+      break
+  }
+}
+
 getAttendingTickets()
+connectToWebSockets(onWebSocketMessageCB)

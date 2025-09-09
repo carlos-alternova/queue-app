@@ -68,7 +68,7 @@ const onWebSocketMessageCB = (type, payload) => {
       activeTicketText.innerText = payload
       break
     default:
-      console.log('event data:', event.data)
+      console.log('event data:', { type, payload })
       break
   }
 }
