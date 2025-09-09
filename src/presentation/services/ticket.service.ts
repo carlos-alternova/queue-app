@@ -18,7 +18,7 @@ export class TicketService {
   }
 
   public get lastHandlingTickets(): Ticket[] {
-    return this.handlingTickets.splice(0, 4)
+    return this.handlingTickets.slice(0, 4)
   }
 
   public get lastTicketNumber() {
